@@ -81,7 +81,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         log.info("扩展消息转换器...");
         //创建一个消息转换器对象
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        //需将消息转换器设置一个对象 转换器，对象转换器可以将Java数据序列化为json格式
+        //需将消息转换器设置一个对象转换器，对象转换器可以将Java数据序列化为json格式
          converter.setObjectMapper(new JacksonObjectMapper());
          //将自己的消息转换器存入容器中
         converters.add(0,converter);    //设置索引0，就是将自己的消息放在第一位，方便读取
