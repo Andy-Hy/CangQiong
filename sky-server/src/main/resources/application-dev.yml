@@ -6,4 +6,4 @@ sky:
     database: sky_take_out
     username: root
     password: 123456
-  git pull origin master
+  alioss:
