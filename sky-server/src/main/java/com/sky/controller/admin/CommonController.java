@@ -27,29 +27,30 @@ public class CommonController {
     @Autowired
     private AliOssUtil aliOssUtil;
 
+    /**
+     * 文件上传
+     * @param file
+     * @return
+     */
     @PostMapping("/upload")
     @ApiOperation("文件上传")
-    public Result<String> upload(MultipartFile file) {
+    public Result<String> upload(MultipartFile file) {  //使用MVC中封装的MultipartFile
         log.info("文件上传：{}", file);
 
         try {
-//        原始文件名
+            //原始文件名
             String originalFilename = file.getOriginalFilename();
-
-//        截取原始文件名的后缀
+            //截取原始文件名的后缀    xxx.png
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-
-//        构造新文件名称
+            //构造新文件名称
             String objectName = UUID.randomUUID().toString() + extension;
-
-//        文件的请求路径
+            //文件的请求路径
             String filePath = aliOssUtil.upload(file.getBytes(), objectName);
             return Result.success(filePath);
         } catch (IOException e) {
-            log.error("文件删除失败：{}", e);
+            log.error("文件上传失败：{}", e);
         }
-
-        return Result.error(MessageConstant.UPLOAD_FAILED);
+        return Result.error(MessageConstant.UPLOAD_FAILED); //文件上传失败
     }
 
 }
