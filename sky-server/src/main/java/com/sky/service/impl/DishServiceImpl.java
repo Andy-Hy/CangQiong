@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.beans.Transient;
 import java.util.List;
@@ -82,6 +83,7 @@ public class DishServiceImpl implements DishService {
      *
      * @param ids
      */
+    @Transactional  //事务注解，保证数据的一致性
     public void deleteBatch(List<Long> ids) {
         //判断当前菜品是否能够删除---是否存在起售中的菜品？
         for (Long id : ids) {   //循环获取id
@@ -100,10 +102,58 @@ public class DishServiceImpl implements DishService {
             for (Long id1 : ids) {
                 dishMapper.deleteById(id1);
                 //删除菜品关联的口味数据
-                dishFlavorMapper.deleByDishId(id);
+                dishFlavorMapper.deleteByDishId(id);
             }
+            //性能优化,改为批量删除
+            //根据菜品id集合批量删除菜品数据
+            //sql: delete from dish where id in (?,?,?)
+//           dishMapper.deleteByIds(ids);
+
+            //根据菜品id集合批量删除关联的口味数据
+            //sql: delete from dish_flavor where dish_id in (?,?,?)
+//            dishFlavorMapper.deleteByDishIds(ids);
 
 
+        }
+    }
+
+    /**
+     * 根据id查询菜品对应口味数据
+     * @param id
+     * @return
+     */
+    public DishVO getByIdWithFlavor(Long id) {
+        //根据id查询菜品数据
+        Dish dish = dishMapper.getById(id);
+        //根据菜品id查询口味数据
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishId(id);//因为口味是多种，所以用集合接收
+        //将查询到的数据封装到VO
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish,dishVO);//属性拷贝
+        dishVO.setFlavors(dishFlavors);
+        return dishVO;
+    }
+
+    /**
+     * 根据id修改菜品基本信息和口味信息
+     * @param dishDTO
+     */
+    @Override
+    public void updateWithFlavor(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+        //修改菜品表基本信息
+        dishMapper.update(dish);
+        //删除原有口味数据                  //修改就是先 删除 再 插入 的操作
+        dishFlavorMapper.deleteByDishId(dishDTO.getId());
+        //重新插入口味数据
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+        if (flavors != null && flavors.size() > 0) {
+            flavors.forEach(dishFlavor -> {     //遍历DishFlavor集合
+                dishFlavor.setDishId(dishDTO.getId());
+            });
+            //向口味表插入n条数据
+            dishFlavorMapper.insertBatch(flavors);
         }
     }
 }
