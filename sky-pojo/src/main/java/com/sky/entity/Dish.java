@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * 菜品
  */
 @Data
-@Builder
+@Builder    //默认为在类中声明的字段生成相应的建造方法
 @NoArgsConstructor
 @AllArgsConstructor
 public class Dish implements Serializable {

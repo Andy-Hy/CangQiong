@@ -17,6 +17,7 @@ import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,5 +192,17 @@ public class DishServiceImpl implements DishService {
                 }
             }
         }
+    }
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     */
+    public List<Dish> list(Long categoryId) {//@Builder:默认为在类中声明的字段生成相应的建造方法
+        Dish dish = Dish.builder() //使用Lombok的建造者模式创建Dish对象
+                .categoryId(categoryId) //设置菜品分类ID(传入查询参数)
+                .status(StatusConstant.ENABLE)//固定设置为启售状态（常量值为1）
+                .build();//完成对象构建
+        return dishMapper.list(dish);//调用Mapper查询数据库
     }
 }

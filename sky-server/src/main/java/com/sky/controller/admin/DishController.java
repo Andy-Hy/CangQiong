@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -104,5 +105,18 @@ public class DishController {
     public Result<String> startOrStop (@PathVariable Integer status,Long id){//@PathVariable:固定参数
         dishService.startOrStop(status,id); //使用startOrStop方法将接收的状态和ID传入Service层
         return Result.success();
+    }
+
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    @GetMapping("/list")
+    @ApiOperation("根据分类id查询菜品")
+    public Result<List<Dish>> list(Long categoryId){//泛型List<Dish>返回菜品列表，categoryId参数用于接收分类ID
+        List<Dish> list = dishService.list(categoryId);//调用dishService的业务逻辑层方法，传入分类ID参数，获取对应下的菜品数据集合
+        return Result.success(list);
     }
 }
