@@ -126,7 +126,7 @@ public class setmealServiceImpl implements SetmealService {
      *
      * @param setmealDTO
      */
-    @Transactional
+    @Transactional  //事务注解  保证数据一致性
     public void update(SetmealDTO setmealDTO) {
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
